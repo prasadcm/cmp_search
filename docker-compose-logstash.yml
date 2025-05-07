@@ -1,0 +1,77 @@
+version: "3.8"
+
+services:
+  copy-ca-cert:
+    image: alpine:latest
+    command: >
+      sh -c 'mkdir -p /to/ca;
+            cp /from/ca/ca.crt /to/ca/ca.crt;
+            chmod 644 /to/ca/ca.crt;
+            sleep 5;
+          '
+    volumes:
+      - elastic_certs:/from:ro
+      - logstash_certs:/to
+    restart: "no" # One-shot container
+    networks:
+      - cmp-elastic
+    healthcheck:
+      test: ["CMD", "test", "-f", "/to/ca/ca.crt"]
+      interval: 1s
+      timeout: 1s
+      retries: 3
+
+  logstash:
+    depends_on:
+      copy-ca-cert:
+        condition: service_healthy
+    image: cmp-logstash:latest
+    env_file:
+      - logstash.env
+    ports:
+      - "${LOGSTASH_PORT}:9600"
+    volumes:
+      - logstash_certs:/usr/share/logstash/config/certs
+      - logstashdata:/usr/share/logstash/data
+      - ./logstash_data/test.json:/usr/share/logstash/input/test.json
+    environment:
+      - ELASTICSEARCH_HOSTS=${ELASTICSEARCH_URL}
+      - CA_CERTIFICATE_PATH=${CA_CERTIFICATE_PATH}
+      - ELASTICSEARCH_USERNAME=${ELASTICSEARCH_USERNAME}
+      - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_PASSWORD}
+
+      - SEARCH_ITEM_TEMPLATE_NAME=${SEARCH_ITEM_TEMPLATE_NAME}
+      - SEARCH_ITEM_INDEX_NAME=${SEARCH_ITEM_INDEX_NAME}
+      - PAGE_SIZE=${PAGE_SIZE}
+    networks:
+      - cmp-elastic
+    stdin_open: true
+    tty: true
+    command: >
+      bash -c '
+        echo -n "Checking ${SEARCH_ITEM_INDEX_NAME}...";
+        if ! curl -s -I --cacert ${CA_CERTIFICATE_PATH} -u "${ELASTICSEARCH_USERNAME}:${ELASTICSEARCH_PASSWORD}" ${ELASTICSEARCH_URL}/${SEARCH_ITEM_INDEX_NAME} | grep -i -q "HTTP/1.1 200 OK"; then
+          echo "Not found";
+          echo "Creating ${SEARCH_ITEM_INDEX_NAME}";
+          curl -X PUT --cacert ${CA_CERTIFICATE_PATH} -u "${ELASTICSEARCH_USERNAME}:${ELASTICSEARCH_PASSWORD}" "${ELASTICSEARCH_URL}/${SEARCH_ITEM_INDEX_NAME}" -H "Content-Type: application/json" -d @templates/${SEARCH_ITEM_INDEX_TEMPLATE_FILE}
+        else
+          echo "Ok"
+        fi
+
+        curl -X PUT --cacert ${CA_CERTIFICATE_PATH} -u "${ELASTICSEARCH_USERNAME}:${ELASTICSEARCH_PASSWORD}" "${ELASTICSEARCH_URL}/_scripts/view_status_update_script" -H "Content-Type: application/json" -d @pipeline/template/view-status-update-script.json
+
+        echo "Launching the pipelines..."
+        bin/logstash -f pipeline/pipeline.conf
+      '
+
+volumes:
+  elastic_certs:
+    external: true
+    name: cmp-elastic_elastic_certs
+  logstash_certs:
+    driver: local
+  logstashdata:
+    driver: local
+
+networks:
+  cmp-elastic:

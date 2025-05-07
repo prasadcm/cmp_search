@@ -1,0 +1,6 @@
+{
+  "script": {
+    "lang": "painless",
+    "source": "if(ctx._source.viewed_by==null){ctx._source.viewed_by = [params.viewed_by];} else{ if(!ctx._source.viewed_by.contains(params.viewed_by)) { ctx._source.viewed_by.add(params.viewed_by);}} ctx._source.view_count += params.count;"
+  }
+}

@@ -1,0 +1,9 @@
+FROM docker.elastic.co/logstash/logstash:9.0.0
+RUN rm -f /usr/share/logstash/pipeline/logstash.conf
+RUN rm -f /usr/share/logstash/config/logstash.yml
+RUN rm -f /usr/share/logstash/config/jvm.options
+COPY --chown=logstash:root pipeline/ /usr/share/logstash/pipeline/
+COPY --chown=logstash:root templates/ /usr/share/logstash/templates/
+COPY --chown=logstash:root config/logstash.yml /usr/share/logstash/config/logstash.yml
+COPY --chown=logstash:root config/jvm.options /usr/share/logstash/config/jvm.options
+CMD /usr/share/logstash/bin/logstash --log.level debug -f /usr/share/logstash/pipeline/pipeline.conf

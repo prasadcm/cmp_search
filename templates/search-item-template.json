@@ -1,0 +1,47 @@
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "cmp_analyzer": {
+          "type": "custom",
+          "tokenizer": "standard",
+          "char_filter": ["html_strip"],
+          "filter": ["apostrophe", "asciifolding", "trim", "stop", "lowercase"]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "userId": {
+        "type": "keyword"
+      },
+      "name": {
+        "type": "text",
+        "analyzer": "cmp_analyzer",
+        "index": true
+      },
+      "createdDate": {
+        "type": "text",
+        "index": false
+      },
+      "updatedDate": {
+        "type": "text",
+        "index": false
+      },
+      "category": {
+        "type": "text",
+        "analyzer": "cmp_analyzer",
+        "index": true
+      },
+      "item": {
+        "type": "text",
+        "analyzer": "cmp_analyzer",
+        "index": true
+      },
+      "searchCount": {
+        "type": "rank_feature"
+      }
+    }
+  }
+}
