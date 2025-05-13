@@ -1,5 +1,1 @@
-{
-  "files.exclude": {
-    "logstash_data/test.json": true
-  }
-}
+{}

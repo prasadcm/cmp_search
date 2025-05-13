@@ -6,7 +6,15 @@ The search service. It is built using ELK stack
 
 - Docker Desktop. Latest version of Docker is installed and running
 
-## How to setup Elastic, Kibana
+## Setup certificates for local development. For production deployments, use trusted certificates from CA.
+
+Run the scripts/generate-certs.sh to generate the certs for elastic, kibana, logstash
+
+```shell
+./scripts/generate-certs.sh
+```
+
+## Setup Elastic, Kibana
 
 ### Step 1 - Launch the docker compose
 
@@ -16,53 +24,48 @@ Run the below command on the terminal. If you are running it for the time, it wi
 docker compose -f ./docker-compose-elastic.yml --env-file ./elastic.env -p cmp-elastic up -d
 ```
 
+If all goes well, you should following output
+
+```shell
+[+] Running 4/4
+ ⠿ Network cmp-elastic_cmp-elastic               Created
+ ⠿ Container cmp-elastic-es01-1                  Healthy
+ ⠿ Container cmp-elastic-kibana-password-init-1  Exited
+ ⠿ Container cmp-elastic-kibana-1                Started
+```
+
 ### Step 2 - Check Elastic, Kibana
 
 Open the kibana dashboard
-Launch the url https://localhost:5601 on the browser.
+Launch the url https://localhost:5601 on the browser. If you get Untrusted error, go to keychain access and Trust the "Elastic Dev CA" certificate.
 Use the below creds to logon. Refer to the elk.env file for details.
 Username: elastic
-Password: elasticpassword
+Password: [password]
 
 If the setup is properly completed, you will be able to view the dashboard
 
-### Step 3 - Create a new index
+### Step 3 - Perform some basic checks
 
-In Kibana, go to Elasticsearch
-Choose New Index and create a test index named `first_test_index`
-
-### Step 4 - Check the index in console
-
-In Kibana, go to Dev Tools --> Console
+In Kibana, Go to Dev Tools --> Console
 Try the following command
 
+#### Create a new index
+
 ```shell
-get first_test_index/_search
+PUT /first_test_index
 ```
 
-You should see a response like this
+You should see a output like this
+
+```shell
 {
-"took": 1,
-"timed_out": false,
-"\_shards": {
-"total": 1,
-"successful": 1,
-"skipped": 0,
-"failed": 0
-},
-"hits": {
-"total": {
-"value": 0,
-"relation": "eq"
-},
-"max_score": null,
-"hits": []
+  "acknowledged": true,
+  "shards_acknowledged": true,
+  "index": "first_test_index"
 }
-}
+```
 
-### Step 5 - Injest test data
-
-Try the below command in the console
+#### Injest test data
 
 ```shell
 PUT first_test_index/_doc/first_data_id_1?refresh
@@ -72,6 +75,22 @@ PUT first_test_index/_doc/first_data_id_1?refresh
   "view_count" : 1
 }
 ```
+
+#### Perform search
+
+```shell
+get first_test_index/_search
+```
+
+You should see a response like this
+
+```shell
+
+```
+
+### Step 5 - Injest test data
+
+Try the below command in the console
 
 ### Step 6 - Sample search
 
@@ -88,19 +107,51 @@ GET first_test_index/_search
 }
 ```
 
-You should see a result.
+You should see a result like this
 
-### How to stop Elastic, Kibana
+```shell
+  {
+    "took": 7,
+    "timed_out": false,
+    "_shards": {
+      "total": 1,
+      "successful": 1,
+      "skipped": 0,
+      "failed": 0
+    },
+    "hits": {
+      "total": {
+        "value": 1,
+        "relation": "eq"
+      },
+      "max_score": 0.2876821,
+      "hits": [
+        {
+          "_index": "first_test_index",
+          "_id": "first_data_id_1",
+          "_score": 0.2876821,
+          "_source": {
+            "title": "Sample data",
+            "subtitle": "My first sample",
+            "view_count": 1
+          }
+        }
+      ]
+    }
+  }
+```
+
+### Stopping Elastic, Kibana
 
 ```shell
 docker compose -f ./docker-compose-elastic.yml --env-file ./elastic.env -p cmp-elastic down
 ```
 
-### How to setup Logstash
+## Setup Logstash
 
-#### Step 1 - Build logstash
+### Step 1 - Build logstash
 
-You need to build the custom logstash docker image. Ensure that you run this each time you make any changes to the Dockerfile.logstash
+You need to build the custom logstash docker image. Ensure that you run this each time you make any changes to the pipelines, templates
 
 For building logstash
 
@@ -108,7 +159,7 @@ For building logstash
 docker build -f ./Dockerfile.logstash -t cmp-logstash:latest .
 ```
 
-#### Step 2 - Run logstash
+### Step 2 - Run logstash
 
 For running logstash service. Make sure Elastic is up and running.
 
@@ -116,7 +167,7 @@ For running logstash service. Make sure Elastic is up and running.
 docker compose -f ./docker-compose-logstash.yml --env-file ./logstash.env -p cmp-logstash up -d
 ```
 
-#### Step 3 - Stop logstash
+## Stop logstash
 
 ```shell
 docker compose -f ./docker-compose-logstash.yml --env-file ./logstash.env -p cmp-logstash down

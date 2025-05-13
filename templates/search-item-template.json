@@ -22,24 +22,33 @@
         "index": true
       },
       "createdDate": {
-        "type": "text",
-        "index": false
+        "type": "date"
       },
       "updatedDate": {
+        "type": "date"
+      },
+      "searchText": {
+        "type": "text",
+        "analyzer": "cmp_analyzer",
+        "index": true,
+        "fields": {
+          "raw": {
+            "type": "keyword"
+          }
+        }
+      },
+      "productIcon": {
         "type": "text",
         "index": false
       },
-      "category": {
+      "productUrl": {
         "type": "text",
-        "analyzer": "cmp_analyzer",
-        "index": true
-      },
-      "item": {
-        "type": "text",
-        "analyzer": "cmp_analyzer",
-        "index": true
+        "index": false
       },
       "searchCount": {
+        "type": "rank_feature"
+      },
+      "productRank": {
         "type": "rank_feature"
       }
     }

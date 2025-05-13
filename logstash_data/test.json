@@ -1,2 +1,7 @@
-{"user_id":"prasad.cm@yahoo.com","name":"Prasad CM","created_date":"2023-10-01","updated_date":"2023-10-01","category":"Personal Care","item":"Shampoo","view_count":10,"viewed_by":1}
+{"user_id":"prasad.cm@yahoo.com","name":"Prasad CM","search_text":"Shampoo","product_icon": "product_icon_shampoo", "product_url": "", "product_rank": 10}
+{"user_id":"prasad.cm@yahoo.com","name":"Prasad CM","search_text":"sugar","product_icon": "product_icon_sugar", "product_url": "", "product_rank": 10}
+{"user_id":"prasad.cm@yahoo.com","name":"Prasad CM","search_text":"chocolate","product_icon": "product_icon_chocolate", "product_url": "", "product_rank": 10}
+{"user_id":"prasad.cm@yahoo.com","name":"Prasad CM","search_text":"SUGAR","product_icon": "product_icon_sugar", "product_url": "", "product_rank": 10}
+{"user_id":"prasad.cm@yahoo.com","name":"Prasad CM","search_text":" sugar ","product_icon": "product_icon_sugar", "product_url": "", "product_rank": 10}
+{"user_id":"prasad.cm@yahoo.com","name":"Prasad CM","search_text":"milk","product_icon": "product_icon_milk", "product_url": "", "product_rank": 10}
 
