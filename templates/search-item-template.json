@@ -1,0 +1,56 @@
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "cmp_analyzer": {
+          "type": "custom",
+          "tokenizer": "standard",
+          "char_filter": ["html_strip"],
+          "filter": ["apostrophe", "asciifolding", "trim", "stop", "lowercase"]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "userId": {
+        "type": "keyword"
+      },
+      "name": {
+        "type": "text",
+        "analyzer": "cmp_analyzer",
+        "index": true
+      },
+      "createdDate": {
+        "type": "date"
+      },
+      "updatedDate": {
+        "type": "date"
+      },
+      "searchText": {
+        "type": "text",
+        "analyzer": "cmp_analyzer",
+        "index": true,
+        "fields": {
+          "raw": {
+            "type": "keyword"
+          }
+        }
+      },
+      "productIcon": {
+        "type": "text",
+        "index": false
+      },
+      "productUrl": {
+        "type": "text",
+        "index": false
+      },
+      "searchCount": {
+        "type": "rank_feature"
+      },
+      "productRank": {
+        "type": "rank_feature"
+      }
+    }
+  }
+}

@@ -1,0 +1,116 @@
+version: "3.8"
+
+services:
+  es01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+    env_file:
+      - elastic.env
+    networks:
+      - cmp-elastic
+    volumes:
+      - ./certs/ca/ca.crt:/usr/share/elasticsearch/config/certs/ca.crt:ro
+      - ./certs/es01/es01.crt:/usr/share/elasticsearch/config/certs/es01.crt:ro
+      - ./certs/es01/es01.key:/usr/share/elasticsearch/config/certs/es01.key:ro
+      - esdata01:/usr/share/elasticsearch/data
+    ports:
+      - ${ES_PORT}:9200
+    environment:
+      - node.name=es01
+      - cluster.name=${CLUSTER_NAME}
+      - cluster.initial_master_nodes=es01
+      - ELASTIC_PASSWORD=${ELASTICSEARCH_PASSWORD}
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=true
+      - xpack.security.http.ssl.key=/usr/share/elasticsearch/config/certs/es01.key
+      - xpack.security.http.ssl.certificate=/usr/share/elasticsearch/config/certs/es01.crt
+      - xpack.security.http.ssl.certificate_authorities=/usr/share/elasticsearch/config/certs/ca.crt
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.key=/usr/share/elasticsearch/config/certs/es01.key
+      - xpack.security.transport.ssl.certificate=/usr/share/elasticsearch/config/certs/es01.crt
+      - xpack.security.transport.ssl.certificate_authorities=/usr/share/elasticsearch/config/certs/ca.crt
+    mem_limit: ${MEM_LIMIT}
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s --cacert /usr/share/elasticsearch/config/certs/ca.crt https://localhost:9200 | grep -q 'missing authentication credentials'",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+
+  kibana-password-init:
+    image: curlimages/curl:latest
+    depends_on:
+      es01:
+        condition: service_healthy
+    env_file:
+      - elastic.env
+    networks:
+      - cmp-elastic
+    volumes:
+      - ./certs/ca/ca.crt:/usr/share/kibana/config/certs/ca.crt:ro
+    command: >
+      sh -c '
+        if [ x${ELASTICSEARCH_PASSWORD} == x ]; then
+          echo "Set the ELASTICSEARCH_PASSWORD environment variable in the .env file";
+          exit 1;
+        elif [ x${KIBANA_PASSWORD} == x ]; then
+          echo "Set the KIBANA_PASSWORD environment variable in the .env file";
+          exit 1;
+        fi;
+        echo "Setting kibana_system password - ${ELASTICSEARCH_INTERNAL_URL}";
+        until curl -s -X POST --cacert /usr/share/kibana/config/certs/ca.crt -u "${ELASTICSEARCH_USERNAME}:${ELASTICSEARCH_PASSWORD}" -H "Content-Type: application/json" ${ELASTICSEARCH_INTERNAL_URL}/_security/user/kibana_system/_password -d "{\"password\":\"${KIBANA_PASSWORD}\"}" | grep -q "^{}"; do sleep 10; done;
+        echo "Kibana password setup done!";
+      '
+    restart: "no"
+
+  kibana:
+    depends_on:
+      kibana-password-init:
+        condition: service_completed_successfully
+    image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
+    networks:
+      - cmp-elastic
+    env_file:
+      - elastic.env
+    volumes:
+      - ./certs/ca/ca.crt:/usr/share/kibana/config/certs/ca.crt:ro
+      - ./certs/kibana/kibana.crt:/usr/share/kibana/config/certs/kibana.crt:ro
+      - ./certs/kibana/kibana.key:/usr/share/kibana/config/certs/kibana.key:ro
+      - kibanadata:/usr/share/kibana/data
+    ports:
+      - ${KIBANA_PORT}:5601
+    environment:
+      - SERVERNAME=kibana
+      - ELASTICSEARCH_HOSTS=${ELASTICSEARCH_INTERNAL_URL}
+      - ELASTICSEARCH_USERNAME=${KIBANA_USERNAME}
+      - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
+      - SERVER_SSL_ENABLED=true
+      - SERVER_SSL_KEY=/usr/share/kibana/config/certs/kibana.key
+      - SERVER_SSL_CERTIFICATE=/usr/share/kibana/config/certs/kibana.crt
+      - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=/usr/share/kibana/config/certs/ca.crt
+    mem_limit: ${MEM_LIMIT}
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s --cacert /usr/share/kibana/config/certs/ca.crt https://localhost:5601 | grep -q 'Kibana'",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+
+volumes:
+  esdata01:
+    driver: local
+  kibanadata:
+    driver: local
+
+networks:
+  cmp-elastic:
