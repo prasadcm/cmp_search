@@ -8,9 +8,9 @@ services:
     networks:
       - cmp-elastic
     volumes:
-      - ./certs/ca/ca.crt:/usr/share/elasticsearch/config/certs/ca.crt:ro
-      - ./certs/es01/es01.crt:/usr/share/elasticsearch/config/certs/es01.crt:ro
-      - ./certs/es01/es01.key:/usr/share/elasticsearch/config/certs/es01.key:ro
+      - ../shared/certs/ca/ca.crt:/usr/share/elasticsearch/config/certs/ca.crt:ro
+      - ../shared/certs/es01/es01.crt:/usr/share/elasticsearch/config/certs/es01.crt:ro
+      - ../shared/certs/es01/es01.key:/usr/share/elasticsearch/config/certs/es01.key:ro
       - esdata01:/usr/share/elasticsearch/data
     ports:
       - ${ES_PORT}:9200
@@ -54,7 +54,7 @@ services:
     networks:
       - cmp-elastic
     volumes:
-      - ./certs/ca/ca.crt:/usr/share/kibana/config/certs/ca.crt:ro
+      - ../shared/certs/ca/ca.crt:/usr/share/kibana/config/certs/ca.crt:ro
     command: >
       sh -c '
         if [ x${ELASTICSEARCH_PASSWORD} == x ]; then
@@ -80,9 +80,9 @@ services:
     env_file:
       - elastic.env
     volumes:
-      - ./certs/ca/ca.crt:/usr/share/kibana/config/certs/ca.crt:ro
-      - ./certs/kibana/kibana.crt:/usr/share/kibana/config/certs/kibana.crt:ro
-      - ./certs/kibana/kibana.key:/usr/share/kibana/config/certs/kibana.key:ro
+      - ../shared/certs/ca/ca.crt:/usr/share/kibana/config/certs/ca.crt:ro
+      - ../shared/certs/kibana/kibana.crt:/usr/share/kibana/config/certs/kibana.crt:ro
+      - ../shared/certs/kibana/kibana.key:/usr/share/kibana/config/certs/kibana.key:ro
       - kibanadata:/usr/share/kibana/data
     ports:
       - ${KIBANA_PORT}:5601

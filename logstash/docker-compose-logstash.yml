@@ -8,11 +8,11 @@ services:
     ports:
       - "${LOGSTASH_PORT}:9600"
     volumes:
-      - ./certs/ca/ca.crt:/usr/share/logstash/config/certs/ca.crt:ro
-      - ./certs/logstash/logstash.crt:/usr/share/logstash/config/certs/logstash.crt:ro
-      - ./certs/logstash/logstash.key:/usr/share/logstash/config/certs/logstash.key:ro
+      - ../shared/certs/ca/ca.crt:/usr/share/logstash/config/certs/ca.crt:ro
+      - ../shared/certs/logstash/logstash.crt:/usr/share/logstash/config/certs/logstash.crt:ro
+      - ../shared/certs/logstash/logstash.key:/usr/share/logstash/config/certs/logstash.key:ro
       - logstashdata:/usr/share/logstash/data
-      - ./logstash_data/test.json:/usr/share/logstash/input/test.json
+      - ./sample_data/test.json:/usr/share/logstash/input/test.json
     environment:
       - ELASTICSEARCH_HOSTS=${ELASTICSEARCH_URL}
       - CA_CERTIFICATE_PATH=${CA_CERTIFICATE_PATH}
