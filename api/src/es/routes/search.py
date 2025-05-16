@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
+from es.models.search import SearchRequest, SearchResponse
+from es.deps.elasticsearch_dep import get_es
+from es.services.search_service import search_documents
 from elasticsearch import AsyncElasticsearch
-from es.models.search import SearchRequest, SearchResponse, SearchHit
-from es.deps.search import get_es
 
 router = APIRouter()
 
@@ -12,16 +13,6 @@ async def search_docs(
     es: AsyncElasticsearch = Depends(get_es),
 ):
     try:
-        result = await es.search(
-            index="cmp-search-item-index-001",
-            query={"match": {"searchText": req.query}},
-        )
-
-        hits = result["hits"]["hits"]
-        return SearchResponse(
-            total=result["hits"]["total"]["value"],
-            results=[SearchHit(id=hit["_id"], source=hit["_source"]) for hit in hits],
-        )
-
+        return await search_documents(es, req)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
