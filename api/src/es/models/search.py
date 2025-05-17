@@ -3,7 +3,8 @@ from typing import List, Optional
 
 
 class SearchRequest(BaseModel):
-    query: str
+    email: Optional[str] = None
+    phone_number: Optional[str] = None
 
 
 class SearchHit(BaseModel):
