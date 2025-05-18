@@ -33,5 +33,5 @@ poetry install
 Run the following command in terminal
 
 ```shell
-poetry run uvicorn es.main:app --reload --host 0.0.0.0 --port 8000
+poetry run uvicorn es.main:app --reload --host localhost --port 3100
 ```

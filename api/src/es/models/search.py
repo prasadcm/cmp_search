@@ -1,10 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Optional
-
-
-class SearchRequest(BaseModel):
-    email: Optional[str] = None
-    phone_number: Optional[str] = None
+from typing import List
 
 
 class SearchHit(BaseModel):

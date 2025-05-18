@@ -1,20 +1,23 @@
 from elasticsearch import AsyncElasticsearch
-from es.models.search import SearchRequest, SearchResponse, SearchHit
+from es.models.search import SearchResponse, SearchHit
 from es.config.settings import settings
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 async def search_documents(
-    es: AsyncElasticsearch, req: SearchRequest
+    es: AsyncElasticsearch, email: str, phone_number: str
 ) -> SearchResponse:
     should_filters = []
 
     # Include non-empty email
-    if req.email and req.email.strip():
-        should_filters.append({"term": {"email": req.email.strip()}})
+    if email and email.strip():
+        should_filters.append({"term": {"email": email.strip()}})
 
     # Include non-empty phone number
-    if req.phone_number and req.phone_number.strip():
-        should_filters.append({"term": {"phoneNumber": req.phone_number.strip()}})
+    if phone_number and phone_number.strip():
+        should_filters.append({"term": {"phoneNumber": phone_number.strip()}})
 
     # If neither email nor phone number is provided, return empty result
     if not should_filters:
