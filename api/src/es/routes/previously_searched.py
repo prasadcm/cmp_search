@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from es.models.search import SearchResponse
+from es.models.previously_searched_item import PreviouslySearchedItemResponse
 from es.deps.elasticsearch_dep import get_es
-from es.services.search_service import search_documents
+from es.services.previously_searched_service import search_documents
 from elasticsearch import AsyncElasticsearch
 
 router = APIRouter()
 
 
-@router.get("", response_model=SearchResponse)
+@router.get("", response_model=PreviouslySearchedItemResponse)
 async def search_docs(
     email: str = Query(None, description="User email"),
     phone_number: str = Query(None, description="User phone number"),

@@ -28,6 +28,11 @@ Run the following command in terminal
 poetry install
 ```
 
+### Dependencies
+
+Ensure that Elastic search service is up and running at the path specified in .env.dev file.
+Refer to README file inside elasticsearch folder for details
+
 ### Run the app in Development mode
 
 Run the following command in terminal
@@ -35,3 +40,7 @@ Run the following command in terminal
 ```shell
 poetry run uvicorn es.main:app --reload --host localhost --port 3100
 ```
+
+### Access swagger UI
+
+Hit the [http://localhost:3100/docs] in browser

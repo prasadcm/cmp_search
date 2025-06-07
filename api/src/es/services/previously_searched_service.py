@@ -1,5 +1,8 @@
 from elasticsearch import AsyncElasticsearch
-from es.models.search import SearchResponse, SearchHit
+from es.models.previously_searched_item import (
+    PreviouslySearchedItemResponse,
+    PreviouslySearchedItemHit,
+)
 from es.config.settings import settings
 import logging
 
@@ -8,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 async def search_documents(
     es: AsyncElasticsearch, email: str, phone_number: str
-) -> SearchResponse:
+) -> PreviouslySearchedItemResponse:
     should_filters = []
 
     # Include non-empty email
@@ -21,7 +24,7 @@ async def search_documents(
 
     # If neither email nor phone number is provided, return empty result
     if not should_filters:
-        return SearchResponse(total=0, results=[])
+        return PreviouslySearchedItemResponse(total=0, results=[])
 
     query = {
         "bool": {
@@ -54,7 +57,7 @@ async def search_documents(
     result = await es.search(index=settings.search_index_name, query=query, size=10)
 
     hits = result["hits"]["hits"]
-    return SearchResponse(
+    return PreviouslySearchedItemResponse(
         total=result["hits"]["total"]["value"],
-        results=[SearchHit(id=hit["_id"], source=hit["_source"]) for hit in hits],
+        results=[PreviouslySearchedItemHit(**hit["_source"]) for hit in hits],
     )
