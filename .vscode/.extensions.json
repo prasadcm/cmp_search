@@ -1,0 +1,19 @@
+{
+  "recommendations": [
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "ms-python.black-formatter",
+    "ms-python.isort",
+    "ms-python.flake8",
+    "matangover.mypy",
+    "statiolake.poetry",
+    "humao.rest-client",
+    "yzhang.fastapi-snippets",
+    "ms-azuretools.vscode-docker",
+    "eamodio.gitlens",
+    "usernamehw.errorlens",
+    "christian-kohler.path-intellisense",
+    "aaron-bond.better-comments",
+    "ms-python.black-formatter"
+  ]
+}

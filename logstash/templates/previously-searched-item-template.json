@@ -13,7 +13,10 @@
   },
   "mappings": {
     "properties": {
-      "userId": {
+      "phoneNumber": {
+        "type": "keyword"
+      },
+      "email": {
         "type": "keyword"
       },
       "name": {

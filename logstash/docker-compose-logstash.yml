@@ -1,0 +1,48 @@
+version: "3.8"
+
+services:
+  logstash:
+    image: cmp-logstash:latest
+    env_file:
+      - logstash.env
+    ports:
+      - "${LOGSTASH_PORT}:9600"
+    volumes:
+      - ../shared/certs/ca/ca.crt:/usr/share/logstash/config/certs/ca.crt:ro
+      - ../shared/certs/logstash/logstash.crt:/usr/share/logstash/config/certs/logstash.crt:ro
+      - ../shared/certs/logstash/logstash.key:/usr/share/logstash/config/certs/logstash.key:ro
+      - logstashdata:/usr/share/logstash/data
+      - ./sample_data/test.json:/usr/share/logstash/input/test.json
+    environment:
+      - ELASTICSEARCH_HOSTS=${ELASTICSEARCH_URL}
+      - CA_CERTIFICATE_PATH=${CA_CERTIFICATE_PATH}
+      - ELASTICSEARCH_USERNAME=${ELASTICSEARCH_USERNAME}
+      - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_PASSWORD}
+
+      - PREVIOUSLY_SEARCHED_ITEM_TEMPLATE_NAME=${PREVIOUSLY_SEARCHED_ITEM_TEMPLATE_NAME}
+      - PREVIOUSLY_SEARCHED_ITEM_INDEX_NAME=${PREVIOUSLY_SEARCHED_ITEM_INDEX_NAME}
+      - PAGE_SIZE=${PAGE_SIZE}
+    networks:
+      - cmp-elastic
+    stdin_open: true
+    tty: true
+    command: >
+      bash -c '
+        echo -n "Checking ${PREVIOUSLY_SEARCHED_ITEM_INDEX_NAME}...";
+        if ! curl -s -I --cacert ${CA_CERTIFICATE_PATH} -u "${ELASTICSEARCH_USERNAME}:${ELASTICSEARCH_PASSWORD}" ${ELASTICSEARCH_URL}/${PREVIOUSLY_SEARCHED_ITEM_INDEX_NAME} | grep -i -q "HTTP/1.1 200 OK"; then
+          echo "Not found";
+          echo "Creating ${PREVIOUSLY_SEARCHED_ITEM_INDEX_NAME}";
+          curl -X PUT --cacert ${CA_CERTIFICATE_PATH} -u "${ELASTICSEARCH_USERNAME}:${ELASTICSEARCH_PASSWORD}" "${ELASTICSEARCH_URL}/${PREVIOUSLY_SEARCHED_ITEM_INDEX_NAME}" -H "Content-Type: application/json" -d @templates/${PREVIOUSLY_SEARCHED_ITEM_INDEX_TEMPLATE_FILE}
+        else
+          echo "Ok"
+        fi
+        echo "Launching the pipelines..."
+        bin/logstash -f pipeline/pipeline.conf
+      '
+
+volumes:
+  logstashdata:
+    driver: local
+
+networks:
+  cmp-elastic:
