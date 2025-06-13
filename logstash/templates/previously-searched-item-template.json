@@ -1,5 +1,8 @@
 {
   "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 1,
+    "refresh_interval": "1s",
     "analysis": {
       "analyzer": {
         "cmp_analyzer": {
@@ -13,7 +16,7 @@
   },
   "mappings": {
     "properties": {
-      "phoneNumber": {
+      "phone_number": {
         "type": "keyword"
       },
       "email": {
@@ -24,13 +27,10 @@
         "analyzer": "cmp_analyzer",
         "index": true
       },
-      "createdDate": {
+      "updated_at": {
         "type": "date"
       },
-      "updatedDate": {
-        "type": "date"
-      },
-      "searchText": {
+      "search_text": {
         "type": "text",
         "analyzer": "cmp_analyzer",
         "index": true,
@@ -40,18 +40,26 @@
           }
         }
       },
-      "productIcon": {
+      "icon_url": {
         "type": "text",
         "index": false
       },
-      "productUrl": {
-        "type": "text",
-        "index": false
+      "type": {
+        "type": "keyword"
       },
-      "searchCount": {
+      "slug": {
+        "type": "keyword"
+      },
+      "product_id": {
+        "type": "keyword"
+      },
+      "category_id": {
+        "type": "keyword"
+      },
+      "search_count": {
         "type": "rank_feature"
       },
-      "productRank": {
+      "popularity": {
         "type": "rank_feature"
       }
     }
