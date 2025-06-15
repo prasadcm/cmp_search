@@ -20,7 +20,7 @@ async def search_documents(
 
     # Include non-empty phone number
     if phone_number and phone_number.strip():
-        should_filters.append({"term": {"phoneNumber": phone_number.strip()}})
+        should_filters.append({"term": {"phone_number": phone_number.strip()}})
 
     # If neither email nor phone number is provided, return empty result
     if not should_filters:
@@ -30,14 +30,14 @@ async def search_documents(
         "bool": {
             "filter": [{"bool": {"should": should_filters, "minimum_should_match": 1}}],
             "should": [
-                {"rank_feature": {"field": "searchCount", "boost": 3}},
-                {"rank_feature": {"field": "productRank", "boost": 2}},
+                {"rank_feature": {"field": "search_count", "boost": 3}},
+                {"rank_feature": {"field": "popularity", "boost": 2}},
                 {
                     "function_score": {
                         "functions": [
                             {
                                 "exp": {
-                                    "updatedDate": {
+                                    "updated_at": {
                                         "origin": "now",
                                         "scale": "7d",
                                         "decay": 0.5,
@@ -54,7 +54,9 @@ async def search_documents(
         }
     }
 
-    result = await es.search(index=settings.search_index_name, query=query, size=10)
+    result = await es.search(
+        index=settings.previously_searched_index_name, query=query, size=10
+    )
 
     hits = result["hits"]["hits"]
     return PreviouslySearchedItemResponse(

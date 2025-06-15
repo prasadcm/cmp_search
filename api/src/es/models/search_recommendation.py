@@ -2,9 +2,9 @@ from pydantic import BaseModel, Field
 from typing import List
 
 
-class PreviouslySearchedItemHit(BaseModel):
+class SearchRecommendationHit(BaseModel):
     iconUrl: str = Field(alias="icon_url")
-    searchText: str = Field(alias="search_text")
+    name: str = Field(alias="name")
     searchCount: int = Field(alias="search_count")
     type: str = Field(alias="type")
     slug: str = Field(alias="slug")
@@ -12,6 +12,6 @@ class PreviouslySearchedItemHit(BaseModel):
     categoryId: str = Field(alias="category_id")
 
 
-class PreviouslySearchedItemResponse(BaseModel):
+class SearchRecommendationResponse(BaseModel):
     total: int
-    results: List[PreviouslySearchedItemHit]
+    results: List[SearchRecommendationHit]

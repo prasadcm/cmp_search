@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from es.clients.elasticsearch_client import close_es_client
-from es.routes import previously_searched
+from es.routes import previously_searched, search_suggestion, search_recommendation
 from contextlib import asynccontextmanager
 from es.config.logging import setup_logging
 
@@ -18,5 +18,15 @@ app = FastAPI(lifespan=lifespan)
 setup_logging()
 
 app.include_router(
-    previously_searched.router, prefix="/previously_searched", tags=["Search"]
+    previously_searched.router,
+    prefix="/previously_searched",
+    tags=["Search"],
+)
+app.include_router(
+    search_suggestion.router, prefix="/search_suggestion", tags=["Suggestion"]
+)
+app.include_router(
+    search_recommendation.router,
+    prefix="/search_recommendation",
+    tags=["Recommendation"],
 )

@@ -1,0 +1,6 @@
+- pipeline.id: "previously_searched"
+  path.config: "/usr/share/logstash/pipeline/previously_searched_pipeline.conf"
+  pipeline.workers: 1
+- pipeline.id: "search_suggestion"
+  path.config: "/usr/share/logstash/pipeline/search_suggestion_pipeline.conf"
+  pipeline.workers: 1
