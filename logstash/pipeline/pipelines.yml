@@ -4,3 +4,6 @@
 - pipeline.id: "search_suggestion"
   path.config: "/usr/share/logstash/pipeline/search_suggestion_pipeline.conf"
   pipeline.workers: 1
+- pipeline.id: "product_search"
+  path.config: "/usr/share/logstash/pipeline/product_search_pipeline.conf"
+  pipeline.workers: 1

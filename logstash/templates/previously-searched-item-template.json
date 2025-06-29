@@ -24,8 +24,7 @@
       },
       "name": {
         "type": "text",
-        "analyzer": "cmp_analyzer",
-        "index": true
+        "index": false
       },
       "updated_at": {
         "type": "date"
@@ -57,10 +56,7 @@
         "type": "keyword"
       },
       "search_count": {
-        "type": "rank_feature"
-      },
-      "popularity": {
-        "type": "rank_feature"
+        "type": "long"
       }
     }
   }

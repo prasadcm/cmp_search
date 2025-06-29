@@ -27,35 +27,37 @@ async def search_documents(
         return PreviouslySearchedItemResponse(total=0, results=[])
 
     query = {
-        "bool": {
-            "filter": [{"bool": {"should": should_filters, "minimum_should_match": 1}}],
-            "should": [
-                {"rank_feature": {"field": "search_count", "boost": 3}},
-                {"rank_feature": {"field": "popularity", "boost": 2}},
+        "function_score": {
+            "query": {
+                "constant_score": {
+                    "filter": {
+                        "bool": {
+                            "should": should_filters,
+                            "minimum_should_match": 1,
+                        }
+                    }
+                }
+            },
+            "functions": [
                 {
-                    "function_score": {
-                        "functions": [
-                            {
-                                "exp": {
-                                    "updated_at": {
-                                        "origin": "now",
-                                        "scale": "7d",
-                                        "decay": 0.5,
-                                    }
-                                }
-                            }
-                        ],
-                        "score_mode": "multiply",
-                        "boost_mode": "multiply",
+                    "field_value_factor": {
+                        "field": "search_count",
+                        "factor": 3,
+                        "missing": 1,
                     }
                 },
+                {"exp": {"updated_at": {"origin": "now", "scale": "7d", "decay": 0.5}}},
             ],
-            "minimum_should_match": 1,
+            "score_mode": "multiply",
+            "boost_mode": "multiply",
         }
     }
-
+    source = ["search_text", "type", "icon_url", "slug", "product_id", "category_id"]
     result = await es.search(
-        index=settings.previously_searched_index_name, query=query, size=10
+        index=settings.previously_searched_index_name,
+        query=query,
+        size=10,
+        source_includes=source,
     )
 
     hits = result["hits"]["hits"]
