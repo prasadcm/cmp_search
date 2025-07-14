@@ -14,6 +14,7 @@ services:
       - logstashdata:/usr/share/logstash/data
       - ./sample_data/previously_searched_sample.json:/usr/share/logstash/input/previously_searched_sample.json
       - ./sample_data/search_suggestion_sample.json:/usr/share/logstash/input/search_suggestion_sample.json
+      - ./sample_data/product_search_sample.json:/usr/share/logstash/input/product_search_sample.json
     environment:
       - ELASTICSEARCH_HOSTS=${ELASTICSEARCH_URL}
       - CA_CERTIFICATE_PATH=${CA_CERTIFICATE_PATH}
@@ -25,6 +26,9 @@ services:
 
       - SEARCH_SUGGESTION_TEMPLATE_NAME=${SEARCH_SUGGESTION_TEMPLATE_NAME}
       - SEARCH_SUGGESTION_INDEX_NAME=${SEARCH_SUGGESTION_INDEX_NAME}
+
+      - PRODUCT_SEARCH_TEMPLATE_NAME=${PRODUCT_SEARCH_TEMPLATE_NAME}
+      - PRODUCT_SEARCH_INDEX_NAME=${PRODUCT_SEARCH_INDEX_NAME}
 
       - PAGE_SIZE=${PAGE_SIZE}
     networks:
@@ -49,7 +53,14 @@ services:
         else
           echo "Ok"
         fi
-
+        echo -n "Checking ${PRODUCT_SEARCH_INDEX_NAME}...";
+        if ! curl -s -I --cacert ${CA_CERTIFICATE_PATH} -u "${ELASTICSEARCH_USERNAME}:${ELASTICSEARCH_PASSWORD}" ${ELASTICSEARCH_URL}/${PRODUCT_SEARCH_INDEX_NAME} | grep -i -q "HTTP/1.1 200 OK"; then
+          echo "Not found";
+          echo "Creating ${PRODUCT_SEARCH_INDEX_NAME}";
+          curl -X PUT --cacert ${CA_CERTIFICATE_PATH} -u "${ELASTICSEARCH_USERNAME}:${ELASTICSEARCH_PASSWORD}" "${ELASTICSEARCH_URL}/${PRODUCT_SEARCH_INDEX_NAME}" -H "Content-Type: application/json" -d @templates/${PRODUCT_SEARCH_INDEX_TEMPLATE_FILE}
+        else
+          echo "Ok"
+        fi
         echo "Injecting sample data..."
         bin/logstash
 

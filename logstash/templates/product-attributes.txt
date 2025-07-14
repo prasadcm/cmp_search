@@ -1,0 +1,54 @@
+productId - NL8KJ
+productType - Product, KitCode, Premium, Ensemble, Warranty
+url - /product/NL8KJ
+shopTag - isWidgetXShop (Hard coded value. Not sure on the usage)
+title - Product title
+isClearance - Boolean
+displayProductasNEW - Boolean
+productCopy - Product description
+offerMessaging - Specail offer message
+siteFirstActive - seconds since epoch 1970 when the product is first active on site
+siteFirstActiveDate - Date since the product is first active on site
+thumb_image - Thubnail image
+shipCode - Shipping code - A, B, C, D etc...
+shippingRestrictions - Array of codes like ["SOOO1"]
+fulfillmentSource - "DROPSHIP" / "STCWHSE"
+savingsStory - Original $449.99
+productProgramEligible - ["HubBox1"]
+promotionalCopy - SAVE $45
+clearnaceSaveBucket - SAVE / CLEARANCE
+isDropShip - Yes / No
+isTruckShip - Yes / No
+hasInventory - Yes / No
+moreOptionsAvailable - Yes / No
+categoryPaths - [ {id: "5", name: "Health & Beauty"}]
+categoryIds -["6", "393"]
+price - In case of product: product price, In case Ensemble: min product price
+priceBucket - A range of price expressed as ["25_to_30"]
+priceMin - In case of product: product price, In case of Ensemble: min product price
+priceMax - In case of product: product price, In case of Ensemble: max product price
+pricePerMonth - Price per month. In case of product: product price per month, In case of Ensemble: min product price per month
+pricePerMonthBucket - A range of price expressed as ["25_to_30"]
+pricePerMonthMin  - Min price per month. In case of product: product price per month, In case of Ensemble: min product price per month
+pricePerMonthMax  - Max price per month. In case of product: product price per month, In case of Ensemble: max product price per month
+ratingTotal - Total number of reviews
+normalizedAverageReview - Normalized average rating = (rating * 2 + 0.5) / 2
+ratingAverage - Average rating
+ratingBucket - ["4.5_to_5", "5_to_5"] A range from 0 to 1 --> 5 to 5.
+skuCount - 3
+inStockSkuCount - 2
+outOfStockSkuCount - 1
+percentInStock - 0.6667
+swatches - [image urls] Format url|Color 
+
+Selling Features
+Brand, Color, Sizes, Beauty Type etc.
+
+childProductIDs - In case of Kit or Ensemble
+
+
+Variants
+color_facet - [Black]
+sku_description - Black, None
+color_group - Black
+

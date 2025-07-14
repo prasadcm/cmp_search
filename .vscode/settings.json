@@ -1,6 +1,7 @@
 {
   "editor.formatOnSave": true,
   "python.formatting.provider": "none",
+  "python.defaultInterpreterPath": "./api/.venv/bin/python",
   "editor.defaultFormatter": null,
   "[python]": {
     "editor.defaultFormatter": "ms-python.black-formatter",

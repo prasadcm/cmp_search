@@ -5,7 +5,6 @@ from typing import List
 class PreviouslySearchedItemHit(BaseModel):
     iconUrl: str = Field(alias="icon_url")
     searchText: str = Field(alias="search_text")
-    searchCount: int = Field(alias="search_count")
     type: str = Field(alias="type")
     slug: str = Field(alias="slug")
     productId: str = Field(alias="product_id")
